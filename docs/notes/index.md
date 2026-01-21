@@ -2,16 +2,9 @@
 next: false
 ---
 
-# littleSt's Blog
+# 📰 Notes
 
-欢迎来到我的博客，期待与你交流！
+这里是对学习过程的一点记录~
 
-## 📰 News
-
-HELLO WORLD!
-
-## 🔍 Just for Fun
-
-<video src="/assets/fun.mp4" controls width="800"></video>
-
-<Confetti />
+## 🔍 导航
+- [机器学习中的优化理论](./optim/optim.md)
