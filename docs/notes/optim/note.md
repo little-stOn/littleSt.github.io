@@ -75,7 +75,7 @@ Let $\mathcal{X} \subseteq \mathbb{R}^d$ be a convex set and $f : \mathcal{X} \t
 **证明：**
 
 1.  我们在 $t = \gamma x + (1 - \gamma) y$ 上用次梯度的定义
-    $$ f(x) - f(t) \ge g_{t}^T(x - t)\\
+    $$f(x) - f(t) \ge g_{t}^T(x - t)\\
     f(y) - f(t) \ge g_{t}^T(y - t)$$
     加权相加可得： $$ \gamma f(x) + (1 - \gamma)f(y) \ge f(t) $$
 
