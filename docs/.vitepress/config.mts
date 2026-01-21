@@ -24,5 +24,8 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/little-stOn/littleSt.github.io' }
     ]
+  },
+  markdown: {
+    math: true
   }
 })
