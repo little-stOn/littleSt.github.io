@@ -13,6 +13,12 @@ export default defineConfig({
 
     sidebar: [
       {
+        text: 'Notes',
+        items: [
+          { text: '机器学习中的优化理论', link: '/notes/optim/note' }
+        ]
+      },
+      {
         text: 'Examples',
         items: [
           { text: 'Markdown Examples', link: '/markdown-examples' },
