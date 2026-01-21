@@ -77,7 +77,7 @@ Let $\mathcal{X} \subseteq \mathbb{R}^d$ be a convex set and $f : \mathcal{X} \t
 1.  我们在 $t = \gamma x + (1 - \gamma) y$ 上用次梯度的定义
     $$f(x) - f(t) \ge g_{t}^T(x - t)$$
     $$f(y) - f(t) \ge g_{t}^T(y - t)$$
-    加权相加可得： $$\gamma f(x) + (1 - \gamma)f(y) \ge f(t)$$
+    加权相加可得： $$\gamma f(x) + (1 - \gamma) f(y) \ge f(t)$$
 
 2.  我们的思路是构造一个次梯度向量。由于 $f(x)$ 是凸函数，故 $\text{epi}(f)   是一个凸集。由支撑超平面定理，对于边界点 $(x, f(x))$，
     $$\exists (a,b) \neq 0, \forall (y, t) \in epi(f), \quad a^T y + b t \ge a^T x + b f(x)$$
