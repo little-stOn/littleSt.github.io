@@ -451,7 +451,7 @@
     ---
 
     <div align="center">
-    <img src="/image.png" width="500">
+    <img src="/assets/image.png" width="500">
     </div>
 
     ---
@@ -581,7 +581,7 @@
     最后，根据 $\ell$-光滑性：
     $$f(x_t) - f(x^*) \le \frac{\ell}{2}\|x_t - x^*\|^2 \le \frac{\ell}{2}\|x_1 - x^*\|^2 \exp\left(-\frac{t-1}{\kappa}\right)$$
 
-![alt text](/image-2.png)
+![alt text](/assets/image-2.png)
 
 ---
 
@@ -748,7 +748,7 @@
     $$
 
     <div align="center">
-    <img src="/image-3.png" width="500">
+    <img src="/assets/image-3.png" width="500">
     </div>
 
     **第五步：合并抵消**
