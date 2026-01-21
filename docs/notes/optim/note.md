@@ -75,9 +75,9 @@ Let $\mathcal{X} \subseteq \mathbb{R}^d$ be a convex set and $f : \mathcal{X} \t
 **证明：**
 
 1.  我们在 $t = \gamma x + (1 - \gamma) y$ 上用次梯度的定义
-    $$f(x) - f(t) \ge g_{t}^T(x - t)\\
-    f(y) - f(t) \ge g_{t}^T(y - t)$$
-    加权相加可得： $$ \gamma f(x) + (1 - \gamma)f(y) \ge f(t) $$
+    $$f(x) - f(t) \ge g_{t}^T(x - t)$$
+    $$f(y) - f(t) \ge g_{t}^T(y - t)$$
+    加权相加可得： $$\gamma f(x) + (1 - \gamma)f(y) \ge f(t)$$
 
 2.  我们的思路是构造一个次梯度向量。由于 $f(x)$ 是凸函数，故 $\text{epi}(f)   是一个凸集。由支撑超平面定理，对于边界点 $(x, f(x))$，
     $$\exists (a,b) \neq 0, \forall (y, t) \in epi(f), \quad a^T y + b t \ge a^T x + b f(x)$$
@@ -87,7 +87,8 @@ Let $\mathcal{X} \subseteq \mathbb{R}^d$ be a convex set and $f : \mathcal{X} \t
     取 $t=f(y)$ 并令 $g = -a/b$，即得次梯度定义式：
     $$ f(y) \ge f(x) + g^T(y - x) \implies \partial f(x) \neq \emptyset $$
 
-3.  由凸性可得：$$\gamma f(x) + (1 - \gamma) f(y) \ge f(\gamma x + (1 - \gamma) y)$$
+3.  由凸性可得：
+    $$\gamma f(x) + (1 - \gamma) f(y) \ge f(\gamma x + (1 - \gamma) y)$$
     进一步整理：
     $$f(y) \ge \frac{f(\gamma x + (1 - \gamma) y) - \gamma f(x)}{1 - \gamma} = f(x) + \frac{f(\gamma x + (1 - \gamma) y) - f(x)}{1 - \gamma}$$
     令 $\gamma \to 1$,
