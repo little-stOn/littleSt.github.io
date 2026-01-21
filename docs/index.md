@@ -12,6 +12,6 @@ HELLO WORLD!
 
 ## 🔍 Just for Fun
 
-<video src="/dist/assets/fun.mp4" controls width="800"></video>
+<video src="/assets/fun.mp4" controls width="800"></video>
 
 <Confetti />
