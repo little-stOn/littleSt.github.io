@@ -79,7 +79,7 @@ Let $\mathcal{X} \subseteq \mathbb{R}^d$ be a convex set and $f : \mathcal{X} \t
     f(y) - f(t) \ge g_{t}^T(y - t)$$
     加权相加可得： $$ \gamma f(x) + (1 - \gamma)f(y) \ge f(t) $$
 
-2.  我们的思路是构造一个次梯度向量。由于 $f(x)$ 是凸函数，故 $\text{epi}(f)$ 是一个凸集。由支撑超平面定理，对于边界点 $(x, f(x))$，$$ \exists (a,b) \neq 0,  \forall (y, t) \in \text{epi}(f), \quad a^T y + b t \ge a^T x + b f(x) $$
+2.  我们的思路是构造一个次梯度向量。由于 $f(x)$ 是凸函数，故 $\text{epi}(f)$ 是一个凸集。由支撑超平面定理，对于边界点 $(x, f(x))$，$$\exists (a,b) \neq 0, \forall (y, t) \in \text{epi}(f), \quad a^T y + b t \ge a^T x + b f(x)$$
     由于 $t$ 可以任意大，必有 $b \ge 0$；又因为 $x$ 是内点，超平面不能垂直（即 $b \neq 0$），故 **$b > 0$**。
     将不等式两边除以 $b$ 并移项，得：
     $$ t \ge f(x) - \frac{a^T}{b}(y - x) $$
@@ -799,7 +799,7 @@ $$T = O\left( \sqrt{\kappa} \log\left(\frac{1}{\epsilon}\right) \right)$$
 ## 9. 优化算法的时间复杂度下界分析
 
 在之前的研究范式中，我们采用的方法都是考察一类算法对一类函数的时间复杂度，进而得到该算法下的时间复杂度，那么我们能否证明我们提出的算法是最优的？也就是说能否给出对于一类函数优化算法的下界（lower bound），这是本节关心的问题：
-$$\forall \text{Algorithm}, \exist f \in \mathcal{F}, \text{its complexity is } \Omega (P(\epsilon))$$
+$$\forall \text{Algorithm}, \exists f \in \mathcal{F}, \text{its complexity is } \Omega (P(\epsilon))$$
 
 考虑一个通用的黑盒算法：
 
