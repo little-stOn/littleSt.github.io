@@ -1,0 +1,21 @@
+# 忽略依赖包（最重要！）
+node_modules
+package-lock.json # 如果你更喜欢 yarn，可以忽略这个；但通常建议保留 package-lock.json。
+# 刚才的教程里我们建议保留 package-lock.json，所以这里不要写它，只忽略 node_modules
+
+# 忽略构建输出
+dist
+.vitepress/dist
+docs/.vitepress/dist
+
+# 忽略缓存
+.vitepress/cache
+docs/.vitepress/cache
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
+
+# 忽略 IDE 配置 (可选)
+.idea
+.vscode
