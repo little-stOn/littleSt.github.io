@@ -951,3 +951,559 @@ $$\min_{1 \le s \le t} f(x_s) - f(x^*) \ge \frac{\ell \|x_1 - x^*\|^2}{8t^2}$$
 ---
 
 类似地对于光滑强凸函数，我们只需考虑：
+$$f(x) = \frac{\ell}{4} \left( \frac{1}{2} \left( e_1^\top x - \frac{R}{\sqrt{t}} \right)^2 + \frac{1}{2} \sum_{i=1}^{t-1} (e_i^\top x - e_{i+1}^\top x)^2 \right) + \frac{\alpha}{2}\|x\|^2$$
+类似可证。
+
+<!-- ---
+
+## 10. 非线性基优化算法下界分析（随机优化算法）
+在本节中，我们不再局限于确定性算法。我们假设一种更通用的算法形式：
+
+$$x_{t+1} = \mathcal{A}(x_1, g_1, \dots, x_t, g_t, r_t),$$
+
+其中 $r_t$ 是某个独立的随机变量。令 $\text{Gap}(\mathcal{A}, t)$ 表示最优性差距，即 $\min_{1 \le s \le t} f(x_s) - f(x^*)$。那么我们的目标是给出如下式的下界：
+
+$$\min_{\mathcal{A} \in \text{rand.alg.}} \max_{f \in \mathcal{F}} \mathbb{E}_{\mathcal{A}} \text{Gap}(\mathcal{A}, t), \tag{8.1}$$
+
+针对某些函数类 $\mathcal{F}$。
+
+单个固定的例子无法构造出下界，因为我们可以很容易地设计出针对该实例“作弊”的算法。例如我们使用
+
+$$f(x) = \max_{1 \le i \le t} e_i^\top x$$
+
+来获得 Lipschitz 凸函数的下界。然而，一个始终输出 $-\frac{1}{\sqrt{t}} \sum_{i=1}^t e_i^\top$（即最小值点）的“随机”算法会破解这个困难实例。
+
+因此，通常的方法是在 $\mathcal{F}$ 上选取某种先验分布 $\mathcal{D}_{\mathcal{F}}$，从而我们有：
+
+$$
+\begin{aligned}
+& \min_{\mathcal{A} \in \text{rand.alg.}} \max_{f \in \mathcal{F}} \mathbb{E}_{\mathcal{A}} \text{Gap}(\mathcal{A}, t) \\
+\ge & \min_{\mathcal{A} \in \text{rand.alg.}} \mathbb{E}_{f \sim \mathcal{D}_{\mathcal{F}}} \mathbb{E}_{\mathcal{A}} \text{Gap}(\mathcal{A}, t) \\
+= & \min_{\mathcal{A} \in \text{rand.alg.}} \mathbb{E}_{\mathcal{A}} \mathbb{E}_{f \sim \mathcal{D}_{\mathcal{F}}} \text{Gap}(\mathcal{A}, t) \\
+= & \min_{\mathcal{A} \in \text{deter.alg.}} \mathbb{E}_{f \sim \mathcal{D}_{\mathcal{F}}} \text{Gap}(\mathcal{A}, t)
+\end{aligned}
+$$
+
+最后一个等号成立的原因是，任何随机算法的期望都可以看作是确定性算法的混合（当固定 $\{r_t\}$ 时，$\mathcal{A}$ 变为确定性算法），因此最小值可以由某个确定性算法达到。
+
+到目前为止，我们已经证明了原始的下界问题 (8.1) 可以简化为寻找 $\min_{\mathcal{A} \in \text{deter.alg.}} \mathbb{E}_{f \sim \mathcal{D}_{\mathcal{F}}} \text{Gap}(\mathcal{A}, t)$ 的下界。现在我们陈述主要结果。
+
+**定理 3.** 对于任何 $L \ge 0, R \ge 0, t$ 以及任何随机算法 $\mathcal{A}$，都存在一个凸且 $L$-Lipschitz 的函数 $f$ 和一个直径为 $R$ 的集合 $\mathcal{X}$，使得
+$$\mathbb{E}_{\mathcal{A}} \min_{1 \le s \le t} f(x_s) - \min_{x \in \mathcal{X}} f(x) \ge \Omega\left(\frac{RL}{\sqrt{t}}\right).$$
+
+通过上述推理，只需考虑确定性算法和“困难”函数上的固定分布。考虑 $\mathcal{X}$ 为以 0 为中心的单位球，且
+$$f(x) = \max_{1 \le i \le t} (v_i^\top x - i\delta),$$
+其中 $\delta$ 是一个标量，且 $\{v_1, \dots, v_t\}$ 是从所有标准正交基集合中均匀随机抽取的。
+
+回想在上一节课中，我们使用函数 $f(x) = \max_{1 \le i \le t} e_i^\top x$ 作为span-algorithm情况下的“困难”实例，因为我们可以保证 $e_i$ 不会在早于第 $i$ 次迭代对结果产生影响。然而，对于随机算法，这一性质将失效。
+
+另一方面，我们对 $\{v_1, \dots, v_t\}$ 的构造确保了 $v_i^\top x$ 是可控的小（例如，若 $x \sim \mathcal{N}(0, \frac{1}{d}I)$，则以高概率（w.h.p.）满足 $|v_i^\top x| \le \mathcal{O}(\frac{1}{\sqrt{d}})$）。如果我们选择足够大的 $\delta$，则可以以高概率确保 $v_i$ 不会在早于第 $i$ 次迭代对结果产生影响。
+
+现在我们给出严谨的证明。
+
+**证明.** 首先，显而易见 $f$ 是 1-Lipschitz 且是凸的。令 $x^* = \arg \min_{x \in \mathcal{X}} f(x)$。
+$$f(x^*) \le f(-\frac{1}{\sqrt{t}} \sum_{i=1}^t v_i) = -\frac{1}{\sqrt{t}} - \delta.$$
+
+在事件 $\tilde{\mathcal{E}} = \{|v_t^\top x_s| \le \frac{\delta}{2}, \forall s \le t\}$ 发生的条件下，
+$$\min_{1 \le s \le t} f(x_s) \ge v_t^\top x - t\delta \ge -(t + \frac{1}{2})\delta.$$
+
+如果我们选择 $\delta = o(\frac{1}{t\sqrt{t}})$，那么
+$$\min_{1 \le s \le t} f(x_s) - f(x^*) \ge -(t + \frac{1}{2})\delta + \frac{1}{\sqrt{t}} + \delta \ge \frac{1}{2\sqrt{t}}.$$
+
+因此，为了证明该定理，只需用某个常数下界来限制 $\text{Pr}[\tilde{\mathcal{E}}]$。
+我们首先定义
+$$\mathcal{E} = \{|v_j^\top x_s| \le \frac{\delta}{2}, 1 \le s \le j \le t\}.$$
+由于 $\mathcal{E} \subseteq \tilde{\mathcal{E}}$，故 $\text{Pr}[\mathcal{E}] \le \text{Pr}[\tilde{\mathcal{E}}]$。
+
+对于任何 $s$，令 $\mathbf{P}_s$ 为向 $\text{Span}(x_1, g_1, \dots, x_s, g_s)$ 的投影，$\mathbf{P}_s^{\perp}$ 为向其正交空间的投影。然后我们定义一系列事件
+$$G_s = \{|v_j^\top \frac{\mathbf{P}_{s-1}^{\perp} x_s}{\|\mathbf{P}_{s-1}^{\perp} x_s\|}| \le \frac{\delta}{2(1 + \sqrt{t})}, \forall j \ge s\}.$$
+
+我们断言 $\bigcap_{s=1}^t G_s \subseteq \mathcal{E}$。 -->
+
+---
+
+## 10. Mirror Descent
+
+关于 Mirror Descent 的一个全面的 [notes](https://cswhjiang.github.io/2015/08/08/large_scale_opt.html)
+
+此前，我们已经看到可以将梯度下降写为“最速下降”的形式：
+
+$$
+\begin{aligned}
+x_{t+1} &= \min_{x \in \mathcal{X}} \left[ f(x_t) + \langle g_t, x - x_t \rangle + \frac{L}{2} \|x - x_t\|_2^2 \right] & (9.1) \\
+&= x_t - \frac{1}{L} g_t, & (9.2)
+\end{aligned}
+$$
+
+其中 $g_t \in \partial f(x)$ 是 $f$ 在 $x$ 处的次梯度集合。为了得到式 (9.2) 给出的梯度下降步长，我们隐含地假设了欧几里得范数平方 $\|x - y\|_2^2$ 是集合中两点 $x$ 和 $y$ 之间距离的一种自然度量。但在许多问题中，可能存在更适合特定集合 $\mathcal{X}$ 的替代距离概念。例如，如果我们是在 $d$ 维概率单纯形 $\Delta$ 上最小化函数 $f$，那么更自然的距离度量是 Kullback-Leibler 散度（KL 散度）：
+
+$$D_{\text{KL}}(P \parallel Q) = \sum_{x \in \mathcal{X}} P(x) \log \frac{P(x)}{Q(x)},$$
+
+其中 $P, Q \in \Delta$ 是概率分布。
+
+此外，我们证明了当对于某个 $G > 0$ 满足 $\|g\|_2 \le G$ 时，由式 (9.2) 给出的梯度下降迭代达到了以下收敛率：
+
+$$\frac{1}{t} \sum_{k=1}^t (f(x_k) - f(x_*)) \le \frac{G \|x_0 - x_*\|_2}{\sqrt{t}}.$$
+
+这是基于 $G$（次梯度 $g_t$ 的 $\ell_2$ 范数界限）的收敛保证。如果我们的距离度量是欧几里得距离 $d(x_k, y_k) = \|x_k - y_k\|_2 = \sqrt{\sum_{k=1}^d (x_k - y_k)^2}$，那么这种保证是很自然的。但如果相反，我们的 Lipschitz 条件是针对 $g_t$ 的 $\ell_\infty$ 范数呢？我们总可以将 $\ell_2$ 范数限制为 $\|g_t\|_2 \le \sqrt{d} \|g_t\|_\infty$ 并使用它，但这可能是非常次优的——例如，如果 $g_t$ 只有一个坐标非零，那么 $\|g_t\|_2 = \|g_t\|_\infty$，然而上述上界会差 $\sqrt{d}$ 倍。
+
+我们将探讨梯度下降的一种推广，它不再局限于欧几里得距离，而是适用于更广泛的一类距离函数。我们考虑可以写成凸函数的 **Bregman 散度 (Bregman divergence)** 的距离函数。
+
+---
+
+**定义 1.** 令 $\Phi : \mathcal{D} \to \mathbb{R}$ 为 $\mathcal{D}$ 上的一个严格凸且连续可微的函数。即，对于任何 $x_1 \neq x_2 \in \mathcal{D}$ 及 $\gamma \in (0, 1)$，有：
+$$\Phi(\gamma x_1 + (1 - \gamma)x_2) < \gamma \Phi(x_1) + (1 - \gamma)\Phi(x_2).$$
+
+与 $\Phi$ 相关的 **Bregman 散度** 定义为：
+$$D_{\Phi}(x, y) = \Phi(x) - \Phi(y) - \langle \nabla \Phi(y), x - y \rangle.$$
+
+这可以被解释为 $\Phi$ 在 $y$ 处的一阶泰勒展开的余项。
+
+$D_{\Phi}$ 具有以下性质：
+
+1. **非负性 (Non-negativity)**：对于所有 $x, y$，我们有 $D_{\Phi}(x, y) \ge 0$。此外，由严格凸性可知，$D_{\Phi}(x, y) = 0$ 当且仅当 $x = y$。
+2. **凸性 (Convexity)**：$D_{\Phi}(x, y)$ 关于 $x$ 是凸的，但关于 $y$ 不一定是凸的。
+
+**注：** 一般来说，Bregman 散度不一定是对称的。即：
+$$D_{\Phi}(x, y) \neq D_{\Phi}(y, x)$$
+
+因此，在严格意义上，Bregman 散度通常不被视为距离函数（因为距离函数必须是对称的）。
+
+**镜像下降（Mirror Descent）** 是梯度下降的一种推广，它利用 Bregman 散度来适应问题的几何特性。当 $\mathcal{X} \subseteq \mathcal{D}$ 时，这种方法特别有用，其中 $\mathcal{X}$ 是约束集，$\mathcal{D}$ 是 $\Phi$ 的定义域。我们称 $\Phi$ 为**镜像映射**（mirror map）。镜像下降允许我们更直接地利用问题的结构。镜像下降有两种表述形式：
+
+*   **原始形式 (Primal Form)**：这种形式是最速下降法的直接推广，我们直接将式 (9.1) 中的欧几里得距离替换为 Bregman 散度：
+    $$x_{t+1} = \text{argmin}_{x \in \mathcal{X}} \left[ \eta g_t^T(x - x_t) + D_\Phi(x, x_t) \right],$$
+    其中 $g_t \in \partial f(x_t)$ 且 $\Phi : \mathcal{D} \to \mathbb{R}$。
+
+*   **对偶形式 (Dual Form)**：这种形式允许我们将镜像下降本身视为在由 $\nabla\Phi(\cdot)$ 定义的“对偶空间”中的一种梯度下降形式。
+    $$
+    \begin{aligned}
+    \nabla\Phi(y_{t+1}) &= \nabla\Phi(x_t) - \eta g_t \\
+    x_{t+1} &= \Pi_\mathcal{X}^\Phi(y_{t+1})
+    \end{aligned}
+    $$
+    其中 $\Pi_\mathcal{X}^\Phi(y) := \text{argmin}_{x \in \mathcal{X}} D_\Phi(x, y)$ 是向 $\mathcal{X}$ 的 **Bregman 投影**。
+
+如下面的命题所示，原始形式和对偶形式是等价的。
+
+**命题.** 镜像下降的原始形式和对偶形式是等价的。
+
+**证明.** 我们从对偶形式中 $x_{t+1}$ 的定义开始：
+$$
+\begin{aligned}
+x_{t+1} &= \text{argmin}_{x \in \mathcal{X}} D_{\Phi}(x, y_{t+1}) \\
+&= \text{argmin}_{x \in \mathcal{X}} [\Phi(x) - \Phi(y_{t+1}) - \langle \nabla \Phi(y_{t+1}), x - y_{t+1} \rangle].
+\end{aligned}
+$$
+
+我们利用 $\nabla \Phi(y_{t+1}) = \nabla \Phi(x_t) - \eta g_t$ 这一事实，得到：
+$$
+\begin{aligned}
+x_{t+1} &= \text{argmin}_{x \in \mathcal{X}} [\Phi(x) - \langle \nabla \Phi(x_t) - \eta g_t, x \rangle] \\
+&= \text{argmin}_{x \in \mathcal{X}} [\Phi(x) - \langle \nabla \Phi(x_t), x \rangle + \eta \langle g_t, x \rangle] \\
+&= \text{argmin}_{x \in \mathcal{X}} [\Phi(x) - \langle \nabla \Phi(x_t), x - x_t \rangle + \eta \langle g_t, x - x_t \rangle] \\
+&= \text{argmin}_{x \in \mathcal{X}} [\eta g_t^T (x - x_t) + \Phi(x) - \Phi(x_t) - \langle \nabla \Phi(x_t), x - x_t \rangle] \\
+&= \text{argmin}_{x \in \mathcal{X}} [\eta g_t^T (x - x_t) + D_{\Phi}(x, x_t)].
+\end{aligned}
+$$
+
+下面我们给出 Bregman 散度的一些重要性质：我们的目标是证明 Bregman 散度满足一定条件下的"反三角不等式"。
+
+**引理 1.** 对于任意三个点 $x, y, z$，
+
+$$
+D_\Phi(x, z) = D_\Phi(x, y) + D_\Phi(y, z) + \langle \nabla \Phi(y) - \nabla \Phi(z), x - y \rangle .
+$$
+
+**证明.** 这是 $D_\Phi$ 定义的直接推论。
+
+**引理 2.** 对于任意 $x \in \mathcal{X}$ 且 $z = \Pi_{\mathcal{X}}^{\Phi}(y)$，我们有：
+$$
+(\nabla \Phi(z) - \nabla \Phi(y))^\top (z - x) \leq 0
+$$
+
+**证明.** 由投影的定义，
+$$
+D_\Phi(z, y) \leq D_\Phi((1 - \lambda)z + \lambda x, y).
+$$
+对 $\lambda$ 在 $\lambda = 0^+$ 处求导：
+$$
+\begin{aligned}
+0 &\leq \left. \frac{\mathrm{d}}{\mathrm{d}\lambda} D_\Phi((1 - \lambda)z + \lambda x, y) \right|_{\lambda=0^+} \\
+&= \left. \frac{\mathrm{d}}{\mathrm{d}\lambda} [\Phi((1 - \lambda)z + \lambda x) - \Phi(y) - \langle \nabla \Phi(y), (1 - \lambda)z + \lambda x - y \rangle] \right|_{\lambda=0^+} \\
+&= \nabla \Phi((1 - \lambda)z + \lambda x)^\top (x - z) - \nabla \Phi(y)^\top (x - z).
+\end{aligned}
+$$
+令 $\lambda \to 0^+$ 可得
+$$
+(\nabla \Phi(z) - \nabla \Phi(y))^\top (x - z) \geq 0,
+$$
+这与引理中的陈述等价。 $\blacksquare$
+
+结合引理 1 和引理 2，我们可以证明广义勾股定理。
+
+**推论 1.** （广义勾股定理）对于任意 $x, y \in \mathbb{R}^d$ 且 $z = \Pi_{\mathcal{X}}^{\Phi}(y)$，我们有
+$$
+D_\Phi(x, z) + D_\Phi(z, y) \leq D_\Phi(x, y).
+$$
+
+**定义 2.** 如果对于所有 $\lambda \in \mathbb{R}$ 和 $x, y \in \mathbb{R}^d$，满足以下条件，我们称 $\|\cdot\|$ 为一个**范数 (norm)**：
+
+*   **(三角不等式)** $\|x + y\| \leq \|x\| + \|y\|$。
+*   **(齐次性)** $\|\lambda x\| = |\lambda|\|x\|$。
+*   **(正定性/仅在 0 处为 0)** $\|x\| = 0$ 当且仅当 $x = 0$。
+
+我们定义 $\|\cdot\|$ 的**对偶 (dual)** 范数为：
+$$
+\|z\|_* = \sup_{\|x\| \leq 1} \langle z, x \rangle .
+$$
+
+**命题 2.** 设 $\|\cdot\|$ 是一个范数。那么其对偶范数 $\|\cdot\|_*$ 也是一个范数。
+
+**范数及其对偶的示例。** 我们将 $p$-范数定义为 $\|x\|_p = \left( \sum_{i=1}^d (x^{(i)})^p \right)^{\frac{1}{p}}$，将 $\infty$-范数定义为 $\|x\|_\infty = \max_{i=1,\dots,d} |x^{(i)}|$。我们在表 9.1 中给出了一些范数及其对偶的示例(由 Holder 不等式可以证明)
+
+| 范数 (norm)        | 对偶范数 (dual norm)                                |
+| :----------------- | :-------------------------------------------------- |
+| $\|\cdot\|_2$      | $\|\cdot\|_2$                                       |
+| $\|\cdot\|_p$      | $\|\cdot\|_q \quad (\frac{1}{p} + \frac{1}{q} = 1)$ |
+| $\|\cdot\|_1$      | $\|\cdot\|_\infty$                                  |
+| $\|\cdot\|_\infty$ | $\|\cdot\|_1$                                       |
+
+<center>表 9.1: 范数与对偶</center>
+
+以下命题给出了对任何范数都成立的柯西-施瓦茨不等式 (Cauchy-Schwartz inequality) 的推广。
+
+**命题 3.** 对于任意 $x, y \in \mathbb{R}^d$，我们有
+$$
+\langle x, y \rangle \leq \|x\| \cdot \|y\|_* .
+$$
+
+**证明.** 根据 $\|\cdot\|_*$ 的定义，我们有
+$$
+\left\langle y, \frac{x}{\|x\|} \right\rangle \leq \|y\|_* .
+$$
+两边同时乘以 $\|x\|$ 即可得到命题的结论。
+
+我们现在做好了证明镜像下降收敛所需的所有必要准备。
+
+**定理 1.** 令 $\Phi$ 在 $\mathcal{X}$ 上相对于某种范数 $\|\cdot\|$ 是 $\rho$-强凸的。假设 $f$ 是凸的，且相对于 $\|\cdot\|$ 是 $L$-利普希茨 (Lipschitz) 连续的。令 $R^2 = \sup_{x \in \mathcal{X}} D_\Phi(x, x_1)$。那么，步长为常数 $\eta = \frac{R}{L}\sqrt{\frac{2}{\rho t}}$ 的镜像下降 (MD) 在迭代 $t$ 次后满足：
+
+$$
+f\left(\frac{1}{t} \sum_{s=1}^t x_s\right) - f(x^*) \leq RL \sqrt{\frac{2}{\rho t}} .
+$$
+
+**证明.** 将三点引理应用于 $x, x_s$ 和 $y_{s+1}$，然后使用镜像下降的对偶形式：
+$$
+\begin{aligned}
+D_\Phi(x, x_s) + D_\Phi(x_s, y_{s+1}) - D_\Phi(x, y_{s+1}) &= - \langle \nabla \Phi(x_s) - \nabla \Phi(y_{s+1}), x - x_s \rangle \\
+&= - \langle \eta g_s, x - x_s \rangle \\
+&= \eta \langle g_s, x_s - x \rangle .
+\end{aligned} \tag{9.3}
+$$
+
+$g_s \in \partial f(x_s)$，根据凸性，接着结合式 (9.3) 和广义勾股定理，我们有：
+$$
+\begin{aligned}
+f(x_s) - f(x) &\leq g_s^\top (x_s - x) \\
+&= \frac{1}{\eta} [D_\Phi(x, x_s) + D_\Phi(x_s, y_{s+1}) - D_\Phi(x, y_{s+1})] \\
+&\leq \frac{1}{\eta} [D_\Phi(x, x_s) + D_\Phi(x_s, y_{s+1}) - D_\Phi(x, x_{s+1}) - D_\Phi(x_{s+1}, y_{s+1})] .
+\end{aligned} \tag{9.4}
+$$
+
+根据 $\Phi$ 的 $\rho$-强凸性：
+$$
+\begin{aligned}
+D_\Phi(x_s, y_{s+1}) - D_\Phi(x_{s+1}, y_{s+1}) &= \Phi(x_s) - \Phi(x_{s+1}) - \nabla \Phi(y_{s+1})^\top (x_s - x_{s+1}) \\
+&\leq \nabla \Phi(x_s)^\top (x_s - x_{s+1}) - \frac{\rho}{2}\|x_s - x_{s+1}\|^2 - \nabla \Phi(y_{s+1})^\top (x_s - x_{s+1}) \\
+&= (\nabla \Phi(x_s) - \nabla \Phi(y_{s+1}), x_s - x_{s+1}) - \frac{\rho}{2}\|x_s - x_{s+1}\|^2 \\
+&= \eta g_s^\top (x_s - x_{s+1}) - \frac{\rho}{2}\|x_s - x_{s+1}\|^2 .
+\end{aligned} 
+$$
+
+注意到由于 $f$ 相对于 $\|\cdot\|$ 是 $L$-利普希茨连续的，因此对于 $f$ 的任何子梯度 $g$，都有 $\|g\|_* \leq L$。将这一事实代入式 (9.5) 并结合命题 3，我们得到：
+$$
+D_\Phi(x_s, y_{s+1}) - D_\Phi(x_{s+1}, y_{s+1}) \leq \eta L \|x_s - x_{s+1}\| - \frac{\rho}{2} \|x_s - x_{s+1}\|^2 .
+$$
+
+注意到对于任何 $a, b \geq 0$，函数 $g(z) = az - bz^2$ 在 $z^* = \frac{a}{2b}$ 处取得最大值 $\frac{a^2}{4b}$，因此：
+$$
+\begin{aligned}
+D_\Phi(x_s, y_{s+1}) - D_\Phi(x_{s+1}, y_{s+1}) &\leq \eta L \|x_s - x_{s+1}\| - \frac{\rho}{2} \|x_s - x_{s+1}\|^2 \\
+&\leq \sup_z \left[ \eta L z - \frac{\rho}{2} z^2 \right] \\
+&= \frac{\eta^2 L^2}{2\rho} .
+\end{aligned} \tag{9.6}
+$$
+
+结合式 (9.4) 和 (9.6)，我们得到：
+$$
+\begin{aligned}
+f(x_s) - f(x) &\leq \frac{1}{\eta} \left[ D_\Phi(x, x_s) - D_\Phi(x, x_{s+1}) + \frac{\eta^2 L^2}{2\rho} \right] \\
+&= \frac{1}{\eta} [D_\Phi(x, x_s) - D_\Phi(x, x_{s+1})] + \frac{\eta L^2}{2\rho} .
+\end{aligned}
+$$
+
+对 $s = 1$ 到 $t$ 求和，
+$$
+\sum_{s=1}^t [f(x_s) - f(x)] \leq \frac{D_\Phi(x, x_1)}{\eta} + \frac{\eta L^2 t}{2\rho} \leq \frac{R^2}{\eta} + \frac{\eta L^2 t}{2\rho} . \tag{9.7}
+$$
+
+取 $x = x^*$。根据 $f$ 的凸性，
+$$
+f\left(\frac{1}{t} \sum_{s=1}^t x_s\right) - f(x^*) \leq \frac{1}{t} \sum_{s=1}^t [f(x_s) - f(x^*)] \leq RL \sqrt{\frac{2}{\rho t}},
+$$
+其中最后的不等式使用了式 (9.7) 以及我们对 $\eta$ 的选择。 $\blacksquare$
+
+但是貌似复杂度也没变好？那我们为什么要用镜像下降这么复杂的东西呢？
+
+**示例 1 (单纯形上的镜像下降)**。考虑在概率单纯形上的优化问题：
+$$
+\Delta_d = \left\{ x \in \mathbb{R}^d : \sum_{i=1}^d x^{(i)} = 1, x^{(i)} \geq 0 \text{ 对所有 } i \text{ 成立} \right\}.
+$$
+设 $f$ 为一个凸函数，且关于 $\ell_1$ 范数是 $L$-利普希茨（Lipschitz）连续的，即对于 $f$ 的所有子梯度 $g_x$，都有 $\|g_x\|_\infty \leq L$（回想一下，无穷范数是 $\ell_1$ 范数的对偶范数）。
+
+对于单纯形上的镜像下降，我们选择负熵作为镜像映射 $\Phi$。那么布雷格曼散度（Bregman divergence）就是 KL 散度（Kullback-Leibler divergence），镜像下降则演变为乘法更新算法（multiplicative updates algorithm）。
+
+为了应用我们的定理，我们需要证明 $\Phi$ 关于 $\ell_1$ 范数是 $\rho$-强凸的，并建立 $D_\Phi(\cdot, x_1)$ 的上界 $R^2$。观察到，平斯克不等式（Pinsker's inequality）提供了 KL 散度的下界：
+$$
+KL(x, y) \geq \frac{1}{2} \|x - y\|_1^2 \quad \text{对所有 } x, y \in \Delta_d \text{ 成立}.
+$$
+在我们的符号表示中，这仅仅意味着 $\rho = 1$。我们选择 $x_1 = \frac{1}{d}\vec{1}$（均匀分布）作为初始值。那么对于任何 $x \in \Delta_d$：
+$$
+KL(x, x_1) = \log d - H(x) \leq \log d
+$$
+其中 $H(x) = -\sum_{i=1}^d x^{(i)} \log x^{(i)}$ 是 $x$ 的熵，它是非负的。因此，我们得到 $R^2 = \log d$。
+
+根据推论 2，我们得到乘法权重算法（multiplicative weights algorithm）达到 $f(x_t) - f(x^*) \leq \varepsilon$ 所需的迭代次数为：
+$$
+\left( \frac{RL}{\varepsilon} \right)^2 \cdot \frac{1}{\rho} = \frac{L^2 \log d}{\varepsilon^2} \tag{9.8}
+$$
+次。
+
+相比之下，考虑将梯度下降（Gradient Descent）应用于该问题：
+
+1. 界 $\|g_x\|_\infty \leq L$ 意味着 $\|g_x\|_2 \leq L\sqrt{d}$。
+2. 单纯形在 $\ell_2$ 范数下的直径为 $\tilde{R}^2 = \sup_{x \in \Delta_d} \|x - x_1\|_2^2 = O(1)$。
+
+因此，投影梯度下降（projected Gradient Descent）的迭代复杂度为：
+$$
+\left( \frac{\tilde{R} L}{\varepsilon} \right)^2 = \frac{L^2 d}{\varepsilon^2} . \tag{9.9}
+$$
+
+通过比较镜像下降 (9.8) 和梯度下降 (9.9) 的复杂度，我们可以看到梯度下降可能要差 $\frac{d}{\log d}$ 倍，这是一种对 $d$ 的*指数级*恶化依赖。
+
+---
+
+## 11. 随机梯度下降
+在本讲中，我们将学习随机梯度下降（Stochastic Gradient Descent）。在随机优化中，我们获得的是某函数 $f$ 的真实（子）梯度的随机近似，而不是真实梯度。具体而言，我们假设函数 $f$ 存在一个梯度算谕器（gradient oracle）$\mathcal{O}$，使得给定任何点 $x \in \mathcal{X}$，它都会返回一个期望满足 $\mathbb{E}[\tilde{g}(x)] \in \partial f(x)$ 的随机向量 $\tilde{g}(x)$。
+
+在本讲中，我们将始终假设 $\tilde{g}(x)$ 的方差对于所有 $x$ 都是一致有界的。
+
+**假设 1 (有界方差).** $\text{Var}(\tilde{g}(x)) := \mathbb{E}[\|\tilde{g}(x) - \mathbb{E}\tilde{g}(x)\|^2] \leq \sigma^2$ 对于所有 $x \in \mathcal{X}$ 成立。
+
+本讲的主要目标是分析针对通常函数类的算法 ??，我们还将讨论小批量（minibatching）的影响。
+
+---
+
+**算法 1** 投影随机梯度下降 (Projected SGD)
+
+**for** $s = 1$ **to** $t$ **do**
+&emsp; $y_{s+1} = x_s - \eta \cdot \tilde{g}(x_s)$.
+&emsp; $x_{s+1} = \Pi_{\mathcal{X}}(y_{s+1})$.
+
+---
+
+**定理 1.** 设 $f$ 为凸函数且 $L$-利普希茨连续，$R = \max_{x \in \mathcal{X}} \|x - x_1\|^2$。如果我们选择步长 $\eta = \frac{R}{\sqrt{(L^2 + \sigma^2)t}}$，那么有：
+
+$$
+\mathbb{E} f\left( \frac{1}{t} \sum_{s=1}^t x_s \right) - f(x^*) \leq R \sqrt{\frac{L^2 + \sigma^2}{t}} \lesssim \underbrace{\frac{RL}{\sqrt{t}}}_{\text{梯度下降（GD）的收敛率}} + \underbrace{\frac{R\sigma}{\sqrt{t}}}_{\text{随机梯度产生的额外误差}} 
+$$
+
+**证明.** 我们有：
+
+$$
+\begin{aligned}
+\mathbb{E} f(x_s) - f(x^*) &\leq \mathbb{E}[\tilde{g}(x_s)^\top (x_s - x^*)] \\
+&= \frac{1}{\eta} \mathbb{E}[(x_s - y_{s+1})^\top (x_s - x^*)] \\
+&= \frac{1}{2\eta} \mathbb{E}[\|x_s - y_{s+1}\|^2 + \|x_s - x^*\|^2 - \|y_{s+1} - x^*\|^2] \\
+&\leq \frac{1}{2\eta} \mathbb{E}[\|x_s - y_{s+1}\|^2 + \|x_s - x^*\|^2 - \|x_{s+1} - x^*\|^2] \\
+&= \frac{1}{2\eta} \mathbb{E}[\|x_s - x^*\|^2 - \|x_{s+1} - x^*\|^2] + \frac{\eta}{2} \mathbb{E}[\|\tilde{g}(x_s)\|^2] \\
+&\leq \frac{1}{2\eta} \mathbb{E}[\|x_s - x^*\|^2 - \|x_{s+1} - x^*\|^2] + \eta \cdot \frac{L^2 + \sigma^2}{2} .
+\end{aligned}
+$$
+
+通过对 $s = 1$ 到 $s = t$ 进行累加（裂项求和）：
+
+$$
+\begin{aligned}
+\mathbb{E} f\left( \frac{1}{t} \sum_{s=1}^t x_s \right) - f(x^*) &\leq \frac{1}{t} \mathbb{E} \sum_{s=1}^t (f(x_s) - f(x^*)) \\
+&\leq \frac{R^2}{2\eta t} + \frac{\eta(L^2 + \sigma^2)}{2} \leq R \sqrt{\frac{L^2 + \sigma^2}{t}} .
+\end{aligned}
+$$
+
+**定理 2.** 设 $f$ 为一个凸且 $\ell$-光滑的函数，令 $R = \|x^* - x_1\|^2$。如果我们选择步长 $\eta = \min\left\{\frac{1}{\ell}, \frac{R}{\sigma\sqrt{2t}}\right\}$，那么：
+$$
+\mathbb{E} f\left(\frac{1}{t} \sum_{s=2}^{t+1} x_s\right) - f(x^*) \leq \underbrace{\frac{R^2 \ell}{2t}}_{\text{GD 的收敛率}} + \underbrace{R\sigma \sqrt{\frac{2}{t}}}_{\text{由于随机性产生的额外误差}} \tag{11.2}
+$$
+
+PSGD 的收敛表现为两个阶段的行为。在优化过程的开始阶段，第一项（即梯度下降中存在的项）占据主导地位，随机梯度下降收敛得相对较快，速度为 $\mathcal{O}(1/t)$。然而，当第一项变得小于第二项时，这种收敛最终会停止，即：
+$$
+\frac{R^2 \ell}{2t} \leq R\sigma \sqrt{\frac{2}{t}} \implies t \geq \left( \frac{R\ell}{2\sigma\sqrt{2}} \right)^2.
+$$
+在第二个阶段，收敛速度放缓至 $\mathcal{O}(1/\sqrt{t})$。我们现在证明对于 $\mathcal{X} = \mathbb{R}^d$ 的定理 ??。
+
+**证明.** 首先，根据光滑性：
+$$
+\begin{aligned}
+\mathbb{E} [f(x_{t+1}) - f(x_t)] &\leq \mathbb{E} \left[ \langle \nabla f(x_t), x_{t+1} - x_t \rangle + \frac{\ell}{2} \|x_{t+1} - x_t\|^2 \right] \\
+&\leq \mathbb{E} \left[ \langle \nabla f(x_t), x_{t+1} - x_t \rangle + \frac{1}{2\eta} \|x_{t+1} - x_t\|^2 \right] \\
+&= \mathbb{E} \left[ -\eta \langle \nabla f(x_t), \tilde{g}(x_t) \rangle + \frac{\eta}{2} \|\tilde{g}(x_t)\|^2 \right] .
+\end{aligned} \tag{11.3}
+$$
+
+令 $\mathbb{E}_t$ 表示基于直到（并包括）时间步 $t$ 的所有信息下的条件期望。接着继 (11.3) 之后，利用全期望公式，我们有：
+$$
+\begin{aligned}
+\mathbb{E} [f(x_{t+1}) - f(x_t)] &\leq \mathbb{E} \left[ -\eta \langle \nabla f(x_t), \tilde{g}(x_t) \rangle + \frac{\eta}{2} \|\tilde{g}(x_t)\|^2 \right] \\
+&= \mathbb{E} \left[ \mathbb{E}_t \left[ -\eta \langle \nabla f(x_t), \tilde{g}(x_t) \rangle + \frac{\eta}{2} \|\tilde{g}(x_t)\|^2 \right] \right] \\
+&= \mathbb{E} \left[ -\eta \langle \nabla f(x_t), \mathbb{E}_t (\tilde{g}(x_t)) \rangle + \frac{\eta}{2} \mathbb{E}_t [\|\tilde{g}(x_t)\|^2] \right] \\
+&= \mathbb{E} \left[ -\eta \|\nabla f(x_t)\|^2 + \frac{\eta}{2} \mathbb{E}_t [\|\tilde{g}(x_t) - \nabla f(x_t)\|^2] + \frac{\eta}{2} \|\nabla f(x_t)\|^2 \right] \\
+&\leq \mathbb{E} \left[ -\frac{\eta}{2} \|\nabla f(x_t)\|^2 + \frac{\eta}{2} \sigma^2 \right] .
+\end{aligned}
+$$
+
+通过与**定理 1**类似的分析：
+$$
+\mathbb{E} [f(x_t) - f(x^*)] \leq \frac{1}{2\eta} \mathbb{E} [\|x_t - x^*\|^2 - \|x_{t+1} - x^*\|^2] + \frac{\eta}{2} \mathbb{E} [\|\nabla f(x_t)\|^2] + \frac{\eta}{2} \sigma^2 .
+$$
+将最后两个不等式相加，我们得到：
+$$
+\mathbb{E} [f(x_{t+1}) - f(x^*)] \leq \frac{1}{2\eta} \mathbb{E} [\|x_s - x^*\|^2 - \|x_{s+1} - x^*\|^2] + \eta \sigma^2 . \tag{11.4}
+$$
+通过对 $s = 2$ 到 $s = t$ 进行累加（裂项求和）：
+$$
+\begin{aligned}
+\mathbb{E} f\left( \frac{1}{t} \sum_{s=2}^{t+1} x_s \right) - f(x^*) &\leq \frac{1}{t} \mathbb{E} \sum_{s=2}^{t+1} (f(x_s) - f(x^*)) \\
+&\leq \frac{R^2}{2\eta t} + \eta \sigma^2 \\
+&= \underbrace{\frac{R^2 \ell}{2t}}_{\text{GD 的收敛率}} + \underbrace{R\sigma \sqrt{\frac{2}{t}}}_{\text{随机梯度产生的额外误差}} ,
+\end{aligned}
+$$
+其中最后一个等式由我们使用的步长 $\eta = \min\left\{\frac{1}{\ell}, \frac{R}{\sigma\sqrt{2t}}\right\}$ 得出。 $\square$
+
+## 12. 随机方差缩减算法
+
+[SVRG 的原始论文](https://papers.nips.cc/paper_files/paper/2013/file/ac1dd209cbcc5e5d1c6e28598e8cbbe8-Paper.pdf)
+
+在这里，我们将介绍随机方差缩减梯度 (SVRG) 算法（这里和原论文略有区别）。算法目标是最小化有限和形式的函数：
+$$
+F(x) = \frac{1}{n} \sum_{i=1}^n f_i(x)
+$$
+
+---
+**算法 1** SVRG
+
+**for** $t = 1, 2, \dots$ **do**
+&emsp; $y_1 = x_t$
+&emsp; 计算 $\nabla F(y_1)$。
+&emsp; **for** $s = 1, 2, \dots, m$ **do**
+&emsp;&emsp; 从 $[n]$ 中均匀采样 $i_s$
+&emsp;&emsp; $y_{s+1} = y_s - \eta (\nabla f_{i_s}(y_s) - \nabla f_{i_s}(y_1) + \nabla F(y_1))$
+&emsp; $x_{t+1} = y_j, j \sim \text{uniform}[m]$
+
+---
+
+SVRG 算法有几个有趣的性质。令 $g_s = \nabla f_{i_s}(y_s) - \nabla f_{i_s}(y_1) + \nabla F(y_1)$。那么，$\mathbb{E}[g_s] = \nabla F(y_s)$（这是因为 $\mathbb{E}[\nabla f_{i_s}(y_1)] = \nabla F(y_1)$）。
+
+现在，考虑 $y_s$ 接近 $y_1$ 的情况。那么，$\nabla f_{i_s}(y_s) \approx \nabla f_{i_s}(y_1)$，且在给定 $y_1$ 的条件下 $\nabla F(y_1)$ 没有方差。因此，这个新的梯度估计量 (a) 仍然是无偏的，并且 (b) 与仅使用 $\nabla f_{i_s}(y_s)$ 作为随机梯度估计量相比，其方差有所缩减。
+
+**引理 1.** 如果 $f$ 是 $\ell$-光滑且凸的，那么对于任意 $x, y$，我们有
+$$
+\frac{1}{2\ell} \|\nabla f(x) - \nabla f(y)\|^2 \leq f(y) - f(x) - \langle \nabla f(x), y - x \rangle
+$$
+
+**证明.** 令 $z = y - \frac{1}{\ell}(\nabla f(y) - \nabla f(x))$。那么由光滑性可知，
+$$
+\begin{aligned}
+f(z) &\leq f(y) + \langle \nabla f(y), z - y \rangle + \frac{\ell}{2} \|z - y\|^2 \\
+&= f(y) + \langle \nabla f(y), z - y \rangle + \frac{1}{2\ell} \|\nabla f(y) - \nabla f(x)\|^2
+\end{aligned} \tag{12.1}
+$$
+由凸性可知，
+$$
+f(z) \geq f(x) + \langle \nabla f(x), z - x \rangle \tag{12.2}
+$$
+从 (12.1) 中减去 (12.2)，可得
+$$
+0 \leq f(y) - f(x) - \langle \nabla f(x), y - x \rangle + \underbrace{\langle \nabla f(y) - \nabla f(x), z - y \rangle}_{-\frac{1}{\ell} \|\nabla f(y) - \nabla f(x)\|^2} + \frac{1}{2\ell} \|\nabla f(y) - \nabla f(x)\|^2
+$$
+
+**引理 2.**
+$$
+\mathbb{E}\|g_s\|^2 \leq 4\ell \cdot \mathbb{E}\left[F(y_s) - F(x^*) + F(y_1) - F(x^*)\right]
+$$
+
+**证明.** 由于 $x^*$ 是 $F$ 的最优解，我们有
+$$
+\begin{aligned}
+\mathbb{E}\|g_s\|^2 &= \mathbb{E}\|\nabla f_{i_s}(y_s) - \nabla f_{i_s}(y_1) + \nabla F(y_1)\|^2 \\
+&= \mathbb{E}\|\left[\nabla f_{i_s}(y_s) - \nabla f_{i_s}(x^*)\right] - \left[\nabla f_{i_s}(y_1) - \nabla f_{i_s}(x^*) - \nabla F(y_1) + \nabla F(x^*)\right]\|^2 \\
+&\leq 2 \left[ \mathbb{E}\|\nabla f_{i_s}(y_s) - \nabla f_{i_s}(x^*)\|^2 + \mathbb{E}\|\nabla f_{i_s}(y_1) - \nabla f_{i_s}(x^*) - \nabla F(y_1) + \nabla F(x^*)\|^2 \right] \\
+&= 2 \left[ \mathbb{E}\|\nabla f_{i_s}(y_s) - \nabla f_{i_s}(x^*)\|^2 + \mathbb{E}\|\nabla f_{i_s}(y_1) - \nabla f_{i_s}(x^*) - \mathbb{E}_{i_s} [\nabla f_{i_s}(y_1) - \nabla f_{i_s}(x^*)]\|^2 \right] \\
+&\leq 2 \left[ \mathbb{E}\|\nabla f_{i_s}(y_s) - \nabla f_{i_s}(x^*)\|^2 + \mathbb{E}\|\nabla f_{i_s}(y_1) - \nabla f_{i_s}(x^*)\|^2 \right] 
+\end{aligned}
+$$
+
+第一个不等式是由于 $\|a+b\|^2 \leq 2\|a\|^2 + 2\|b\|^2$，第二个不等式是由于 $\text{Var}(x) \leq \mathbb{E}\|x\|^2$。根据引理 1，我们有
+$$
+\|\nabla f_i(x) - \nabla f_i(x^*)\|^2 \leq 2\ell \left(f_i(x) - f_i(x^*) - \langle \nabla f_i(x^*), x - x^* \rangle\right)
+$$
+$$
+\begin{aligned}
+\mathbb{E}_{i \sim \text{uniform}[n]} \|\nabla f_i(x) - \nabla f_i(x^*)\|^2 &= \frac{1}{n} \sum_{i=1}^n \|\nabla f_i(x) - \nabla f_i(x^*)\|^2 \\
+&\leq 2\ell \left( F(x) - F(x^*) - \underbrace{\langle \nabla F(x^*), x - x^* \rangle}_{=0} \right) \\
+&= 2\ell (F(x) - F(x^*))
+\end{aligned}
+$$
+
+因此，(12.3) 变为
+$$
+\mathbb{E}\|g_s\|^2 \leq 4\ell \cdot \mathbb{E}\left[F(y_s) - F(x^*) + F(y_1) - F(x^*)\right]
+$$
+
+**定理 1.** 假设对于所有的 $i$，$f_i$ 都是 $\ell$-光滑的，且 $F = \frac{1}{n} \sum_{i=1}^n f_i$ 是 $\alpha$-强凸的。那么，如果我们运行 SVRG 算法，取 $\eta = \frac{1}{10\ell}$ 且 $m = 50\kappa$（其中 $\kappa = \ell/\alpha$），则有
+
+$$
+\mathbb{E} [F(x_t) - F(x^*)] \leq \left( \frac{1}{2} \right)^t [F(x_0) - F(x^*)]
+$$
+
+**证明**。我们将证明对于每个外层循环迭代 $t$，
+$$
+\mathbb{E}[F(x_{t+1}) - F(x^*)] \leq \frac{1}{2}\mathbb{E}[F(x_t) - F(x^*)]
+$$
+
+对于固定的 $t$，
+$$
+\begin{aligned}
+\mathbb{E} \|y_{s+1} - x^*\|^2 &= \mathbb{E} \|y_s - \eta \cdot g_s - x^*\|^2 \\
+&= \mathbb{E}[\|y_s - x^*\|^2 - 2\eta\langle g_s, y_s - x^* \rangle + \eta^2 \|g_s\|^2] \\
+&= \mathbb{E}[\|y_s - x^*\|^2 - 2\eta\underbrace{\langle \nabla F(y_s), y_s - x^* \rangle}_{\geq F(y_s) - F(x^*)} + \eta^2 \|g_s\|^2] \\
+&\leq \mathbb{E} \|y_s - x^*\|^2 - 2\eta\mathbb{E}[F(y_s) - F(x^*)] + \eta^2\mathbb{E} \|g_s\|^2 \\
+&\leq \mathbb{E} \|y_s - x^*\|^2 - 2\eta\mathbb{E}[F(y_s) - F(x^*)] + 4\eta^2\ell \cdot \mathbb{E}[F(y_s) - F(x^*) + F(y_1) - F(x^*)] \\
+&= \mathbb{E} \|y_s - x^*\|^2 - 2\eta(1 - 2\eta\ell)\mathbb{E}[F(y_s) - F(x^*)] + 4\eta^2\ell \cdot \mathbb{E}[F(y_1) - F(x^*)]
+\end{aligned}
+$$
+
+第二个不等式来自于引理 2。我们可以对 $s = 1, \dots, m$ 求和得到：
+$$
+2\eta(1 - 2\eta\ell) \sum_{s=1}^m \mathbb{E}[F(y_s) - F(x^*)] \leq \mathbb{E}\|y_1 - x^*\|^2 + 4m\eta^2\ell \cdot \mathbb{E}[F(y_1) - F(x^*)]
+$$
+
+因此，
+$$
+\begin{aligned}
+\mathbb{E}[F(x_{t+1}) - F(x^*)] &= \frac{1}{m} \sum_{s=1}^m \mathbb{E}[F(y_s) - F(x^*)] \\
+&\leq \frac{1}{2m\eta(1 - 2\eta\ell)} \mathbb{E} \left[\|y_1 - x^*\|^2 + 4m\eta^2\ell [F(y_1) - F(x^*)]\right] \\
+&\leq \frac{1}{2m\eta(1 - 2\eta\ell)} \left(\frac{2}{\alpha} + 4m\eta^2\ell\right) \mathbb{E}[F(x_t) - F(x^*)]
+\end{aligned}
+$$
+
+在最后一行，我们利用强凸性得到 $\|y_1 - x^*\|^2 \leq \frac{2}{\alpha}(F(y_1) - F(x^*))$，并利用 SVRG 算法中 $y_1 = x_t$ 的事实。当 $\eta = \frac{1}{10\ell}$ 且 $m = 50\kappa$ 时，我们得到所需的结果。 $\square$
