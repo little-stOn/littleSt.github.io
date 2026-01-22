@@ -1024,7 +1024,7 @@ $$G_s = \{|v_j^\top \frac{\mathbf{P}_{s-1}^{\perp} x_s}{\|\mathbf{P}_{s-1}^{\per
 
 ## 10. Mirror Descent
 
-关于 Mirror Descent 的一个全面的 [notes](https://cswhjiang.github.io/2015/08/08/large_scale_opt.html)
+关于 Mirror Descent 的一个全面的 [notes](https://users.cecs.anu.edu.au/~xzhang/teaching/bregman.pdf)
 
 此前，我们已经看到可以将梯度下降写为“最速下降”的形式：
 
