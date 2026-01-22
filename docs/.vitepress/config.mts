@@ -15,7 +15,7 @@ export default defineConfig({
       {
         text: 'Notes',
         items: [
-          { text: '机器学习中的优化理论', link: '/notes/optim/note' }
+          { text: '机器学习中的凸优化理论', link: '/notes/optim/note' }
         ]
       },
       {
