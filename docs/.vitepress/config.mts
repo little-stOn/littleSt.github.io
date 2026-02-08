@@ -16,7 +16,8 @@ export default defineConfig({
         text: 'Notes',
         items: [
           { text: '机器学习中的凸优化理论', link: '/notes/optim/note' },
-          { text: '线性回归：最小二乘法', link: '/notes/最小二乘法/最小二乘法' }
+          { text: '线性回归：最小二乘法', link: '/notes/线性回归/最小二乘法' },
+          { text: '线性回归：岭回归', link: '/notes/线性回归/岭回归' },
         ]
       },
       {
