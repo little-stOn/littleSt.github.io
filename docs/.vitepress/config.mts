@@ -20,6 +20,7 @@ export default defineConfig({
           { text: '线性回归：岭回归', link: '/notes/线性回归/岭回归' },
           { text: '线性分类：感知机模型', link: '/notes/线性分类/感知机' },
           { text: 'ARM架构基础：Part 1', link: '/notes/ARM架构/ARM_intro' },
+          { text: 'ARM架构基础：Part 2', link: '/notes/ARM架构/ARM_part2' }        
         ]
       },
       {
