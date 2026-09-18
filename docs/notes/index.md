@@ -13,3 +13,4 @@ next: false
 - [线性分类：感知机模型](./线性分类/感知机.md)
 - [ARM架构基础：Part 1](./ARM架构/ARM_intro.md)
 - [ARM架构基础：Part 2](./ARM架构/ARM_part2.md)
+- [DDPM & DDIM](./生成扩散模型学习/DDPM%20%26%20DDIM（修订版）.md)
