@@ -33,9 +33,9 @@
 
 接下来推导损失函数的表达式就是顺其自然的了，第一部分对应的是重构损失，第二部分对应的是最小化 $\mathcal{L}_{\text{reg}} = D_{KL}\left( P(z|x_k) \parallel \mathcal{N}(0, I) \right)$
 
-\[
+$$
 \mathcal{L}_{\mathrm{VAE}}(x_k) = \underbrace{\|x_k - g\left(\mu_k + \sigma_k \odot \epsilon\right)\|^2}_{\text{重构损失 (MSE)}} + \underbrace{\frac{1}{2}\sum_{j=1}^J \left(\mu_{k,j}^2 + \sigma_{k,j}^2 - \log(\sigma_{k,j}^2) - 1\right)}_{\text{KL 散度正则化项}}
-\]
+$$
 
 这里最后这个损失函数还有一个值得注意的细节：
 - 我们这里特意把 $z$ 写成了 $\mu_k + \sigma_k \odot \epsilon$，这是为了便于做反向传播（将不可导的采样随机性转移到外部无参的 $\epsilon$，从而让梯度能够正常回传去更新编码器中输出均值和方差的参数）
